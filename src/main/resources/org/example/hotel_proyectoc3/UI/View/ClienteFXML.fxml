@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<Pane id="panelCliente" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.hotel_proyectoc3.Controllers.addClienteController">
+   <children>
+      <GridPane layoutX="59.0" layoutY="46.0" prefHeight="308.0" prefWidth="483.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="185.0" minWidth="10.0" prefWidth="182.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="336.0" minWidth="10.0" prefWidth="270.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints maxHeight="81.0" minHeight="0.0" prefHeight="32.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="197.0" minHeight="0.0" prefHeight="52.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="203.0" minHeight="0.0" prefHeight="39.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="203.0" minHeight="10.0" prefHeight="36.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="166.0" minHeight="0.0" prefHeight="38.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="166.0" minHeight="10.0" prefHeight="29.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="166.0" minHeight="0.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="166.0" minHeight="3.0" prefHeight="34.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Label id="lblNumeroIdentificacion" prefHeight="45.0" prefWidth="204.0" text="Número de Identificación" textAlignment="RIGHT" GridPane.rowIndex="1">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Label>
+            <TextField id="txtNombre" fx:id="txtNombre" accessibleText="Número de identificación" prefHeight="25.0" prefWidth="278.0" GridPane.columnIndex="1" />
+            <Label id="lblNombre" prefHeight="6.0" prefWidth="63.0" text="Nombre" />
+            <TextField id="txtNumeroIdentificacion" fx:id="txtNumeroIdentificacion" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Label id="lblPrimerApellido" text="Primer Apellido" GridPane.rowIndex="2" />
+            <TextField id="txtPrimerApellido" fx:id="txtPrimerApellido" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" GridPane.rowIndex="4" />
+            <Label id="lblFechaNacimiento" text="Fecha de Nacimiento" GridPane.rowIndex="4" />
+            <DatePicker id="dtpFechaNacimiento" fx:id="dtpFechaNacimiento" prefHeight="25.0" prefWidth="304.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <Label GridPane.rowIndex="5" />
+            <Label id="lblSegundoApellido" text="Segundo Apellido" GridPane.rowIndex="3" />
+            <TextField id="txtSegundoApellido" fx:id="txtSegundoApellido" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <TextField id="txtDireccion" fx:id="txtDireccion" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+            <Label id="lblDireccion" text="Dirección" GridPane.rowIndex="5" />
+            <Label id="lblID" text="ID" GridPane.rowIndex="6" />
+            <TextField id="txtID" promptText="(ID Interno del hotel)" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+            <Label id="lblEdad" text="Edad" GridPane.rowIndex="7" />
+            <TextField id="txtEdad" fx:id="txtEdad" disable="true" prefHeight="1.0" prefWidth="262.0" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+         </children>
+      </GridPane>
+      <Label id="lblTitulo" layoutX="216.0" layoutY="13.0" text="Registro de Clientes" underline="true">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <Button id="btnGuardar" fx:id="btnGuardar" layoutX="525.0" layoutY="359.0" mnemonicParsing="false" onAction="#guardarCliente" prefHeight="27.0" prefWidth="61.0" text="Guardar" />
+   </children>
+</Pane>
