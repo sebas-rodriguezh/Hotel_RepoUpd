@@ -14,6 +14,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.example.hotel_proyectoc3.Domain.Model.Cliente;
+import org.example.hotel_proyectoc3.Domain.Logic.ClienteLogica;
 
 import java.io.IOException;
 import java.net.URL;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 
 public class TabConsultaClientesController implements Initializable {
 
+    @FXML private ComboBox <String> comboBoxCriteroFiltro;
     @FXML private Button btnBuscar;
     @FXML private Button btnEliminarClienteSeleccionado;
     @FXML private Button btnModificarClienteSeleccionado;
@@ -34,6 +36,11 @@ public class TabConsultaClientesController implements Initializable {
     @FXML private TableView <Cliente> tblClientes;
 
     private final ObservableList<Cliente> listaClientes = FXCollections.observableArrayList(); //Esta es la que debe de veni  de logica y repo.
+
+    private static final String RUTA_CLIENTE = java.nio.file.Paths.get(System.getProperty("user.dir"),"bd","clientes.xml").toString();
+    private final ClienteLogica clienteLogica = new ClienteLogica(RUTA_CLIENTE);
+
+
 
 
 
@@ -50,6 +57,9 @@ public class TabConsultaClientesController implements Initializable {
                     return;
                 }
             }
+            //Primero enviamos a escribir a la base de datos.
+            clienteLogica.create(nuevoCliente);
+            //Luego cargamos la información en memoria.
             listaClientes.add(nuevoCliente);
         }
     }
@@ -101,6 +111,7 @@ public class TabConsultaClientesController implements Initializable {
         Cliente modificado = mostrarFormulario(clienteSeleccionado, Boolean.valueOf(true));
 
         if (modificado != null) {
+            clienteLogica.update(clienteSeleccionado);
             tblClientes.refresh();
         }
     }
@@ -114,6 +125,8 @@ public class TabConsultaClientesController implements Initializable {
                 mostrarAlerta("Seleccione un cliente", "Seleccione un cliente.");
                 return;
             }
+
+            clienteLogica.deleteById(clienteSeleccionado.getId());
             listaClientes.remove(clienteSeleccionado);
         }
 
@@ -125,18 +138,19 @@ public class TabConsultaClientesController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
-            colIdCliente.setCellValueFactory(new PropertyValueFactory<>("id"));
-            colNombreCliente.setCellValueFactory(new PropertyValueFactory<>("nombre"));
-            colIdentificacionCliente.setCellValueFactory(new PropertyValueFactory<>("identificacion"));
+        colIdCliente.setCellValueFactory(new PropertyValueFactory<>("id"));
+        colNombreCliente.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+        colIdentificacionCliente.setCellValueFactory(new PropertyValueFactory<>("identificacion"));
 
-            listaClientes.addAll(
-                    new Cliente(1111, "12345", "Sebas", "Rodriguez", LocalDate.of(2001,12,18)),
-                    new Cliente(2222, "54332", "Celeste", "Chinchilla", LocalDate.of(2002,11,20)),
-                    new Cliente(3333, "224354", "Leticia", "Hernandez", LocalDate.of(1997,7,6)),
-                    new Cliente(4444, "454434", "Minor", "Rodriguez", LocalDate.of(1992,6,15))
-            );
+        listaClientes.addAll(
+                new Cliente(1111, "12345", "Sebas", "Rodriguez", LocalDate.of(2001,12,18)),
+                new Cliente(2222, "54332", "Celeste", "Chinchilla", LocalDate.of(2002,11,20)),
+                new Cliente(3333, "224354", "Leticia", "Hernandez", LocalDate.of(1997,7,6)),
+                new Cliente(4444, "454434", "Minor", "Rodriguez", LocalDate.of(1992,6,15))
+        );
 
-            tblClientes.setItems(listaClientes);
+        listaClientes.addAll(clienteLogica.findAll());
+        tblClientes.setItems(listaClientes);
 
     }
 
@@ -149,13 +163,16 @@ public class TabConsultaClientesController implements Initializable {
                 return;
             }
 
-            ObservableList<Cliente> filtrados = listaClientes.stream()
-                    .filter(c -> c.getIdentificacion().toLowerCase().contains(criterio)
-                            || c.getNombre().toLowerCase().contains(criterio)
-                            || c.getPrimerApellido().toLowerCase().contains(criterio))
-                    .collect(Collectors.toCollection(FXCollections::observableArrayList));
+//            ObservableList<Cliente> filtrados = listaClientes.stream()
+//                    .filter(c -> c.getIdentificacion().toLowerCase().contains(criterio)
+//                            || c.getNombre().toLowerCase().contains(criterio)
+//                            || c.getPrimerApellido().toLowerCase().contains(criterio))
+//                    .collect(Collectors.toCollection(FXCollections::observableArrayList));
 
-            tblClientes.setItems(filtrados);
+
+            listaClientes.addAll(clienteLogica.findAllByParameters(criterio));
+            tblClientes.setItems(listaClientes);
+
         } catch (Exception error) {
             mostrarAlerta("Error buscando el cliente", error.getMessage());
         }

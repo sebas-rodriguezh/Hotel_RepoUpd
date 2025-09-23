@@ -13,6 +13,8 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.example.hotel_proyectoc3.Domain.Logic.ClienteLogica;
+import org.example.hotel_proyectoc3.Domain.Model.Cliente;
 import org.example.hotel_proyectoc3.Domain.Model.Habitacion;
 
 import java.io.IOException;
@@ -20,8 +22,11 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
-public class TabConsultaHabitacionesController implements Initializable {
+public class
 
+TabConsultaHabitacionesController implements Initializable {
+
+    @FXML private ComboBox <String> comboBoxCriteroFiltro;
     @FXML private Button btnInsertarHabitacion;
     @FXML private Button btnModificarHabitacion;
     @FXML private Button btnEliminarHabitacion;
@@ -164,6 +169,7 @@ public class TabConsultaHabitacionesController implements Initializable {
                             h.getDescripcionTipo().toLowerCase().contains(criterio) ||
                             String.valueOf(h.getPrecio()).toLowerCase().contains(criterio))
                     .collect(Collectors.toCollection(FXCollections::observableArrayList));
+
 
             tblHabitaciones.setItems(filtradas);
         } catch (Exception error) {
