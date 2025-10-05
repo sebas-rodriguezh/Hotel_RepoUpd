@@ -1,4 +1,5 @@
 package org.example.hotel_proyectoc3.Domain.Logic;
+import org.example.hotel_proyectoc3.Domain.Model.Cliente;
 import org.example.hotel_proyectoc3.Domain.Model.Habitacion;
 
 import java.util.ArrayList;
@@ -46,6 +47,10 @@ public class GestorHabitaciones {
 
         listaHabitaciones.add(habitacion);
         return true;
+    }
+
+    public List<Habitacion> getHabitaciones() {
+        return listaHabitaciones;
     }
 
     public String mostrarHabitaciones() {

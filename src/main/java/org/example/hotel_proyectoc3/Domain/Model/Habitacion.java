@@ -5,7 +5,7 @@ public class Habitacion {
     private int numero; //Control de forma visual.
     private int tipo; //Suite - Standard. (base de datos)
     private String descripcionTipo; //Suite - Standard. ( Aplicación.)
-    private int estado; //Clausurado - Reservado - En Mantenimiento. (base de datos)
+    private int estado; //Clausurado - Reservado - En Mantenimiento - Perfectas condiciones. (base de datos)
     private String descripcionEstado; //Aplicación.
     private double precio;
     private int capacidad;
@@ -15,14 +15,6 @@ public class Habitacion {
 
     }
 
-    public Boolean getDisponible() {
-        return disponible;
-    }
-
-    public void setDisponible(Boolean disponible) {
-        this.disponible = disponible;
-    }
-
     public Habitacion(int id, int numero, int tipo, int estado, double precio, int capacidad) {
         this.id = id;
         this.numero = numero;
@@ -30,7 +22,44 @@ public class Habitacion {
         this.estado = estado;
         this.precio = precio;
         this.capacidad = capacidad;
-        this.disponible = true;
+        actualizarDescripciones();
+        this.disponible = (estado == 1);
+    }
+
+    private void actualizarDescripciones() {
+        switch (this.tipo) {
+            case 1: this.descripcionTipo = "Standard"; break;
+            case 2: this.descripcionTipo = "Suite"; break;
+            default: this.descripcionTipo = "Desconocido";
+        }
+
+        switch (this.estado) {
+            case 1: this.descripcionEstado = "Perfecto"; break;
+            case 2: this.descripcionEstado = "Mantenimiento"; break;
+            case 3: this.descripcionEstado = "Reservada"; break;
+            case 4: this.descripcionEstado = "Clausurada"; break;
+            case 5: this.descripcionEstado = "Ocupada"; break;
+            default: this.descripcionEstado = "Desconocido";
+        }
+    }
+
+    public String getDisponibleTexto() {
+        return disponible ? "Sí" : "No";
+    }
+
+    public Boolean getDisponible() {
+        return disponible;
+    }
+
+    public void setDisponible(Boolean disponible) {
+        this.disponible = disponible;
+        if (disponible && this.estado != 1) {
+            this.estado = 1;
+            actualizarDescripciones();
+        } else if (!disponible && this.estado == 1) {
+            this.estado = 2;
+            actualizarDescripciones();
+        }
     }
 
     public int getCapacidad() {
@@ -63,6 +92,8 @@ public class Habitacion {
 
     public void setEstado(int estado) {
         this.estado = estado;
+        actualizarDescripciones();
+        this.disponible = (estado == 1);
     }
 
     public String getDescripcionEstado() {
@@ -79,6 +110,7 @@ public class Habitacion {
 
     public void setTipo(int tipo) {
         this.tipo = tipo;
+        actualizarDescripciones();
     }
 
     public int getId() {
@@ -96,7 +128,4 @@ public class Habitacion {
     public void setNumero(int numero) {
         this.numero = numero;
     }
-
-
-
 }
