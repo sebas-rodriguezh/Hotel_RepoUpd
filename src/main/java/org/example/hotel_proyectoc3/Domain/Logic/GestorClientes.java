@@ -4,14 +4,14 @@ import org.example.hotel_proyectoc3.Domain.Model.Cliente;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ListaCliente {
+public class GestorClientes {
     private List<Cliente> clientes;
 
-    public ListaCliente() {
+    public GestorClientes() {
         clientes = new ArrayList<Cliente>();
     }
 
-    public ListaCliente(List<Cliente> clientes) {
+    public GestorClientes(List<Cliente> clientes) {
         this.clientes = new ArrayList<Cliente>(clientes);
     }
 

@@ -1,36 +1,39 @@
 package org.example.hotel_proyectoc3.Domain.Logic;
+
 import org.example.hotel_proyectoc3.Domain.Model.BitacoraLimpieza;
 import org.example.hotel_proyectoc3.Domain.Model.BitacoraMantenimiento;
 import org.example.hotel_proyectoc3.Domain.Model.Parqueo;
 
-
 //El hotel es el controlador que se encarga de algunas interacciones del sistema. Sin generar dependencias.
 //Importante que el hotel mantenga referencias a todas las grandes colecciones, y que tenga un control generalizado de todo lo que lo compone.
 public class Hotel {
+    // Instancia única del Singleton
+    private static Hotel instance;
+
     //Listas (Es como si fueran las bases de datos que controla el Hotel).
-    private ListaCliente clientes;
-    private ListaPersonal trabajadores;
-    private ListaReservacion reservaciones;
-    private ListaHabitaciones habitaciones;
+    private GestorClientes clientes;
+    private GestorPersonal trabajadores;
+    private GestorReservaciones reservaciones;
+    private GestorHabitaciones habitaciones;
 
     //En este caso el hotel solo cuenta con un elemento de los siguientes atributos, por eso mantiene una referencia simple a una instancia.
     private Parqueo parqueo;
     private BitacoraLimpieza bitacoraLimpieza;
     private BitacoraMantenimiento bitacoraMantenimiento;
 
-
-    public Hotel() {
-        this.clientes = new ListaCliente();
-        this.trabajadores = new ListaPersonal();
-        this.reservaciones = new ListaReservacion();
-        this.habitaciones = new ListaHabitaciones();
+    // Constructor privado para prevenir instanciación externa
+    private Hotel() {
+        this.clientes = new GestorClientes();
+        this.trabajadores = new GestorPersonal();
+        this.reservaciones = new GestorReservaciones();
+        this.habitaciones = new GestorHabitaciones();
 
         this.parqueo = new Parqueo();
         this.bitacoraLimpieza = new BitacoraLimpieza();
         this.bitacoraMantenimiento = new BitacoraMantenimiento();
     }
 
-    public Hotel(ListaCliente clientes, ListaPersonal trabajadores, ListaReservacion reservaciones, ListaHabitaciones habitaciones) {
+    private Hotel(GestorClientes clientes, GestorPersonal trabajadores, GestorReservaciones reservaciones, GestorHabitaciones habitaciones) {
         this.clientes = clientes;
         this.trabajadores = trabajadores;
         this.reservaciones = reservaciones;
@@ -41,36 +44,58 @@ public class Hotel {
         this.bitacoraMantenimiento = new BitacoraMantenimiento();
     }
 
+    // Método estático para obtener la instancia única (versión básica)
+    public static Hotel getInstance() {
+        if (instance == null) {
+            instance = new Hotel();
+        }
+        return instance;
+    }
 
-    public ListaCliente getClientes() {
+    // Método estático para obtener la instancia única con parámetros (opcional)
+    public static Hotel getInstance(GestorClientes clientes, GestorPersonal trabajadores,
+                                    GestorReservaciones reservaciones, GestorHabitaciones habitaciones) {
+        if (instance == null) {
+            instance = new Hotel(clientes, trabajadores, reservaciones, habitaciones);
+        }
+        return instance;
+    }
+
+    // Método para reiniciar la instancia (útil para testing)
+    public static void resetInstance() {
+        instance = null;
+    }
+
+    // Getters y Setters (se mantienen igual)
+    public GestorClientes getClientes() {
         return clientes;
     }
 
-    public void setClientes(ListaCliente clientes) {
+    public void setClientes(GestorClientes clientes) {
         this.clientes = clientes;
     }
 
-    public ListaPersonal getTrabajadores() {
+    public GestorPersonal getTrabajadores() {
         return trabajadores;
     }
 
-    public void setTrabajadores(ListaPersonal trabajadores) {
+    public void setTrabajadores(GestorPersonal trabajadores) {
         this.trabajadores = trabajadores;
     }
 
-    public ListaReservacion getReservaciones() {
+    public GestorReservaciones getReservaciones() {
         return reservaciones;
     }
 
-    public void setReservaciones(ListaReservacion reservaciones) {
+    public void setReservaciones(GestorReservaciones reservaciones) {
         this.reservaciones = reservaciones;
     }
 
-    public ListaHabitaciones getHabitaciones() {
+    public GestorHabitaciones getHabitaciones() {
         return habitaciones;
     }
 
-    public void setHabitaciones(ListaHabitaciones habitaciones) {
+    public void setHabitaciones(GestorHabitaciones habitaciones) {
         this.habitaciones = habitaciones;
     }
 

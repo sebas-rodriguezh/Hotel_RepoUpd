@@ -1,6 +1,6 @@
 package org.example.hotel_proyectoc3.Domain.Model;
-import org.example.hotel_proyectoc3.Domain.Logic.ListaCliente;
-import org.example.hotel_proyectoc3.Domain.Logic.ListaPersonal;
+import org.example.hotel_proyectoc3.Domain.Logic.GestorClientes;
+import org.example.hotel_proyectoc3.Domain.Logic.GestorPersonal;
 
 import java.time.LocalDate;
 
@@ -22,8 +22,8 @@ public class Main {
         Personal perso5 = new Limpieza(5005, "78901234", 37000, "Ricardo", "Navarro", LocalDate.of(1987, 9, 22));
 
 
-        ListaCliente listaClientes = new  ListaCliente();
-        ListaPersonal listaPesonales = new ListaPersonal();
+        GestorClientes listaClientes = new GestorClientes();
+        GestorPersonal listaPesonales = new GestorPersonal();
 
         listaClientes.insertarCliente(client1, false);
         listaClientes.insertarCliente(client2, false);

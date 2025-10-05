@@ -4,14 +4,14 @@ import org.example.hotel_proyectoc3.Domain.Model.Habitacion;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ListaHabitaciones {
+public class GestorHabitaciones {
     private List<Habitacion> listaHabitaciones;
 
-    public ListaHabitaciones() {
+    public GestorHabitaciones() {
         listaHabitaciones = new ArrayList<Habitacion>();
     }
 
-    public ListaHabitaciones(List<Habitacion> listaHabitaciones) {
+    public GestorHabitaciones(List<Habitacion> listaHabitaciones) {
         this.listaHabitaciones = new ArrayList<Habitacion>(listaHabitaciones);
     }
 

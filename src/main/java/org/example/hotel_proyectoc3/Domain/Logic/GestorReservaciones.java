@@ -5,14 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDate;
 
-public class ListaReservacion {
+public class GestorReservaciones {
     private List<Reservacion> reservaciones;
 
-    public ListaReservacion() {
+    public GestorReservaciones() {
         this.reservaciones = new ArrayList<Reservacion>();
     }
 
-    public ListaReservacion(List<Reservacion> reservaciones) {
+    public GestorReservaciones(List<Reservacion> reservaciones) {
         this.reservaciones = new ArrayList<Reservacion>(reservaciones);
     }
 
