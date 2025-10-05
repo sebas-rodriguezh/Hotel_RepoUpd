@@ -26,6 +26,18 @@ public class Habitacion {
         this.disponible = (estado == 1);
     }
 
+    public Habitacion(int numero, int tipo, int estado, double precio, int capacidad) {
+        this.id = 0; //Para luego hacerlo auto-incremental con la bd.
+        this.numero = numero;
+        this.tipo = tipo;
+        this.estado = estado;
+        this.precio = precio;
+        this.capacidad = capacidad;
+        actualizarDescripciones();
+        this.disponible = (estado == 1);
+    }
+
+
     private void actualizarDescripciones() {
         switch (this.tipo) {
             case 1: this.descripcionTipo = "Standard"; break;
