@@ -2,6 +2,10 @@ module org.example.hotel_proyectoc3 {
     requires javafx.controls;
     requires javafx.fxml;
     requires jakarta.xml.bind; //Nueva.
+    requires java.sql; //Nueva para SQL.
+    requires com.zaxxer.hikari; //Nueva para zaxxer.
+    requires com.mysql.cj;
+    //requires mysql.connector.j;
 
     exports org.example.hotel_proyectoc3;
     opens org.example.hotel_proyectoc3.Domain.Model to javafx.base;
