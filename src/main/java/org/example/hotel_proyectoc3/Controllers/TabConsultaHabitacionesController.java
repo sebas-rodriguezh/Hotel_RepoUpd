@@ -25,13 +25,13 @@ import java.util.stream.Collectors;
 public class
 
 TabConsultaHabitacionesController implements Initializable {
-
     @FXML private ComboBox <String> comboBoxCriteroFiltro;
     @FXML private Button btnInsertarHabitacion;
     @FXML private Button btnModificarHabitacion;
     @FXML private Button btnEliminarHabitacion;
     @FXML private TextField txtFiltroHabitaciones;
     @FXML private TableColumn<Habitacion, Integer> colNumeroHabitacion;
+    @FXML private TableColumn <Habitacion, Integer> colIDHabitacion;
     @FXML private TableColumn<Habitacion, String> colTipoHabitacion;
     @FXML private TableColumn<Habitacion, Double> colPrecioHabitacion;
     @FXML private TableView<Habitacion> tblHabitaciones;
@@ -42,15 +42,33 @@ TabConsultaHabitacionesController implements Initializable {
     public void insertarHabitacion(ActionEvent actionEvent) {
         Habitacion nuevaHabitacion = mostrarFormulario(null, false);
         if (nuevaHabitacion != null) {
-            // Verificar si ya existe una habitación con el mismo ID o número
-            for (Habitacion h : listaHabitaciones) {
-                if (h.getId() == nuevaHabitacion.getId() || h.getNumero() == nuevaHabitacion.getNumero()) {
-                    mostrarAlerta("Habitación ya existe", "Ya existe una habitación con ese ID o número.");
-                    return;
-                }
+            // Verificar si ya existe una habitación con el mismo número
+            boolean numeroExiste = listaHabitaciones.stream()
+                    .anyMatch(h -> h.getNumero() == nuevaHabitacion.getNumero());
+
+            if (numeroExiste) {
+                mostrarAlerta("Habitación ya existe", "Ya existe una habitación con ese número.");
+                return;
             }
+
+            // Generar ID autoincremental
+            int idAutoIncremental = generarNuevoID();
+            nuevaHabitacion.setId(idAutoIncremental);
+
             listaHabitaciones.add(nuevaHabitacion);
         }
+    }
+
+    private int generarNuevoID() {
+        if (listaHabitaciones.isEmpty()) {
+            return 1; // Primer ID
+        }
+
+        // Encontrar el máximo ID actual y sumar 1
+        return listaHabitaciones.stream()
+                .mapToInt(Habitacion::getId)
+                .max()
+                .orElse(0) + 1;
     }
 
     @FXML
@@ -119,6 +137,7 @@ TabConsultaHabitacionesController implements Initializable {
             colNumeroHabitacion.setCellValueFactory(new PropertyValueFactory<>("numero"));
             colTipoHabitacion.setCellValueFactory(new PropertyValueFactory<>("descripcionTipo"));
             colPrecioHabitacion.setCellValueFactory(new PropertyValueFactory<>("precio"));
+            colIDHabitacion.setCellValueFactory(new PropertyValueFactory<>("id"));
 
             // Agregar datos de ejemplo
             listaHabitaciones.addAll(
@@ -127,32 +146,8 @@ TabConsultaHabitacionesController implements Initializable {
                     new Habitacion(3, 201, 1, 1, 200.0, 4),
                     new Habitacion(4, 202, 2, 1, 120.0, 3)
             );
-
-            // Asignar descripciones a las habitaciones de ejemplo
-            for (Habitacion habitacion : listaHabitaciones) {
-                asignarDescripciones(habitacion);
-            }
-
             tblHabitaciones.setItems(listaHabitaciones);
         });
-    }
-
-    private void asignarDescripciones(Habitacion habitacion) {
-        // Asignar descripción del tipo
-        switch (habitacion.getTipo()) {
-            case 1 -> habitacion.setDescripcionTipo("Suite");
-            case 2 -> habitacion.setDescripcionTipo("Standard");
-            default -> habitacion.setDescripcionTipo("Desconocido");
-        }
-
-        // Asignar descripción del estado
-        switch (habitacion.getEstado()) {
-            case 1 -> habitacion.setDescripcionEstado("Libre");
-            case 2 -> habitacion.setDescripcionEstado("Clausurado");
-            case 3 -> habitacion.setDescripcionEstado("Reservado");
-            case 4 -> habitacion.setDescripcionEstado("Mantenimiento");
-            default -> habitacion.setDescripcionEstado("Desconocido");
-        }
     }
 
     @FXML

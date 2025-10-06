@@ -140,4 +140,43 @@ public class Habitacion {
     public void setNumero(int numero) {
         this.numero = numero;
     }
+
+   public static int convertirTipoACodigo(String tipoSeleccionado) {
+       return switch (tipoSeleccionado) {
+           case "Standard" -> 1;
+           case "Suite" -> 2;
+           default -> 0;
+       };
+    }
+    public static int convertirEstadoACodigo(String estadoSeleccionado) {
+        return switch (estadoSeleccionado) {
+            case "Perfecto" -> 1;
+            case "Mantenimiento" -> 2;
+            case "Reservada" -> 3;
+            case "Clausurada" -> 4;
+            case "Ocupada" -> 5;
+            default -> 0;
+        };
+    }
+
+    public static String convertirCodigoATipo(int codigo) {
+        return switch (codigo) {
+            case 1 -> "Standard";
+            case 2 -> "Suite";
+            default -> "Desconocido";
+        };
+    }
+
+    public static String convertirCodigoAEstado(int codigo) {
+        return switch (codigo) {
+            case 1 -> "Perfecto";
+            case 2 -> "Mantenimiento";
+            case 3 -> "Reservada";
+            case 4 -> "Clausurada";
+            case 5 -> "Ocupada";
+            default -> "Desconocido";
+        };
+    }
+
+
 }
