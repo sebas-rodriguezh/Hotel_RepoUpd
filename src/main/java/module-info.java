@@ -4,7 +4,8 @@ module org.example.hotel_proyectoc3 {
     requires jakarta.xml.bind; //Nueva.
     requires java.sql; //Nueva para SQL.
     requires com.zaxxer.hikari; //Nueva para zaxxer.
-    requires com.mysql.cj;
+    //requires com.mysql.cj;
+    requires mysql.connector.j;
     //requires mysql.connector.j;
 
     exports org.example.hotel_proyectoc3;

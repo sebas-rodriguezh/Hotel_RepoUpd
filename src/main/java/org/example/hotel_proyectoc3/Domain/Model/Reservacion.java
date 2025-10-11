@@ -9,7 +9,7 @@ public class Reservacion {
     private LocalDate fechaReservacion;
     private LocalDate fechaLlegada;
     private int cantidadDeNoches;
-    private String fechaSalida;
+    private LocalDate fechaSalida;
     private double precioTotal;
     private double descuento;
 
@@ -26,6 +26,15 @@ public class Reservacion {
 
         this.setPrecioTotal();
 
+    }
+
+    public Reservacion(Cliente cliente, Habitacion habitacion, LocalDate fechaLlegada, int cantidadDeNoches, double descuento) {
+        this.cliente = cliente;
+        this.habitacion = habitacion;
+        this.fechaLlegada = fechaLlegada;
+        this.cantidadDeNoches = cantidadDeNoches;
+        this.descuento = descuento;
+        this.setPrecioTotal();
     }
 
     public Habitacion getHabitacion() {
@@ -76,11 +85,11 @@ public class Reservacion {
         this.cantidadDeNoches = cantidadDeNoches;
     }
 
-    public String getFechaSalida() {
+    public LocalDate getFechaSalida() {
         return fechaSalida;
     }
 
-    public void setFechaSalida(String fechaSalida) {
+    public void setFechaSalida(LocalDate fechaSalida) {
         this.fechaSalida = fechaSalida;
     }
 
@@ -88,11 +97,14 @@ public class Reservacion {
         return precioTotal;
     }
 
-    public void setPrecioTotal() {
-        //Aquí deberíamos tener un calculo entre la totalidad de noches, y el precio de la habitación.
 
+    public void setPrecioTotal() {
         if ((habitacion != null) && (cantidadDeNoches > 0)) {
-            this.precioTotal = (habitacion.getPrecio() * cantidadDeNoches) - descuento;
+            double precioBase = habitacion.getPrecio() * cantidadDeNoches;
+            if (descuento > precioBase) {
+                throw new IllegalArgumentException("Error: El descuento no puede ser mayor al precio total de la reservación.");
+            }
+            this.precioTotal = precioBase - descuento;
         } else {
             throw new IllegalArgumentException("Error: Cantidad de noches menor que 0 o no existe habitacion asignada. ");
         }

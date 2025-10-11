@@ -129,18 +129,17 @@ public class BuscarClienteController implements Initializable {
     @FXML
     private void seleccionarCliente(ActionEvent actionEvent) {
         if (ClienteSeleccionado == null) {
-            mostrarAlerta("Seleccione Cliente", "Debe seleccionar un Cliente.");
+            mostrarAlerta("Seleccione un Cliente", "Debe seleccionar un Cliente.");
             return;
         }
 
-//        try {
-//            if (controllerPadre != null) {
-//                controllerPadre.setClienteSeleccionado(ClienteSeleccionado);
-//            }
-//            cerrarVentana();
-//        } catch (Exception e) {
-//            mostrarAlerta("Error", "Error al seleccionar Cliente: " + e.getMessage());
-//        }
+        try {
+            Stage stage = (Stage) comboBoxFiltro.getScene().getWindow();
+            stage.setUserData(ClienteSeleccionado);
+            cerrarVentana();
+        } catch (Exception e) {
+            mostrarAlerta("Error", "Error al seleccionar cliente: " + e.getMessage());
+        }
     }
 
     private void cerrarVentana() {
@@ -155,4 +154,5 @@ public class BuscarClienteController implements Initializable {
         alert.setContentText(mensaje);
         alert.showAndWait();
     }
+
 }

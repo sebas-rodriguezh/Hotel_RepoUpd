@@ -14,11 +14,14 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.example.hotel_proyectoc3.Domain.Logic.ClienteLogica;
+import org.example.hotel_proyectoc3.Domain.Logic.HabitacionLogica;
+import org.example.hotel_proyectoc3.Domain.Logic.Hotel;
 import org.example.hotel_proyectoc3.Domain.Model.Cliente;
 import org.example.hotel_proyectoc3.Domain.Model.Habitacion;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
@@ -37,55 +40,46 @@ TabConsultaHabitacionesController implements Initializable {
     @FXML private TableView<Habitacion> tblHabitaciones;
 
     private final ObservableList<Habitacion> listaHabitaciones = FXCollections.observableArrayList();
+    private final HabitacionLogica habitacionLogica = Hotel.getInstance().getHabitaciones();
+
 
     @FXML
     public void insertarHabitacion(ActionEvent actionEvent) {
-        Habitacion nuevaHabitacion = mostrarFormulario(null, false);
-        if (nuevaHabitacion != null) {
-            // Verificar si ya existe una habitación con el mismo número
-            boolean numeroExiste = listaHabitaciones.stream()
-                    .anyMatch(h -> h.getNumero() == nuevaHabitacion.getNumero());
-
-            if (numeroExiste) {
-                mostrarAlerta("Habitación ya existe", "Ya existe una habitación con ese número.");
-                return;
+        try {
+            Habitacion nuevaHabitacion = mostrarFormulario(null, false);
+            if (nuevaHabitacion != null) {
+                // Recargar datos desde la base de datos
+                cargarHabitacionesDesdeBD();
+                mostrarAlerta("Éxito", "Habitación creada correctamente");
             }
-
-            // Generar ID autoincremental
-            int idAutoIncremental = generarNuevoID();
-            nuevaHabitacion.setId(idAutoIncremental);
-
-            listaHabitaciones.add(nuevaHabitacion);
+        } catch (Exception e) {
+            mostrarAlerta("Error", "No se pudo crear la habitación: " + e.getMessage());
         }
-    }
-
-    private int generarNuevoID() {
-        if (listaHabitaciones.isEmpty()) {
-            return 1; // Primer ID
-        }
-
-        // Encontrar el máximo ID actual y sumar 1
-        return listaHabitaciones.stream()
-                .mapToInt(Habitacion::getId)
-                .max()
-                .orElse(0) + 1;
     }
 
     @FXML
     public void modificarHabitacion(ActionEvent actionEvent) {
-        Habitacion habitacionSeleccionada = tblHabitaciones.getSelectionModel().getSelectedItem();
+        try {
+            Habitacion habitacionSeleccionada = tblHabitaciones.getSelectionModel().getSelectedItem();
 
-        if (habitacionSeleccionada == null) {
-            mostrarAlerta("Seleccione una habitación", "Debe seleccionar una habitación.");
-            return;
-        }
+            if (habitacionSeleccionada == null) {
+                mostrarAlerta("Seleccione una habitación", "Debe seleccionar una habitación.");
+                return;
+            }
 
-        Habitacion modificada = mostrarFormulario(habitacionSeleccionada, true);
+            Habitacion modificada = mostrarFormulario(habitacionSeleccionada, true);
 
-        if (modificada != null) {
-            tblHabitaciones.refresh();
+            if (modificada != null) {
+                // Recargar datos desde la base de datos
+                cargarHabitacionesDesdeBD();
+                mostrarAlerta("Éxito", "Habitación actualizada correctamente");
+            }
+        } catch (Exception e) {
+            mostrarAlerta("Error", "No se pudo modificar la habitación: " + e.getMessage());
         }
     }
+
+
 
     @FXML
     public void eliminarHabitacion(ActionEvent actionEvent) {
@@ -95,11 +89,29 @@ TabConsultaHabitacionesController implements Initializable {
                 mostrarAlerta("Seleccione una habitación", "Seleccione una habitación.");
                 return;
             }
-            listaHabitaciones.remove(habitacionSeleccionada);
+            boolean eliminado = habitacionLogica.deleteById(habitacionSeleccionada.getId());
+            if (eliminado) {
+                cargarHabitacionesDesdeBD();
+                mostrarAlerta("Éxito", "Habitación eliminada correctamente");
+            } else {
+                mostrarAlerta("Error", "No se pudo eliminar la habitación");
+            }
+
         } catch (Exception error) {
             mostrarAlerta("Error eliminando la habitación", error.getMessage());
         }
     }
+
+    private void cargarHabitacionesDesdeBD() {
+        try {
+            listaHabitaciones.clear();
+            listaHabitaciones.addAll(habitacionLogica.findAll());
+            tblHabitaciones.setItems(listaHabitaciones);
+        } catch (SQLException e) {
+            mostrarAlerta("Error", "No se pudieron cargar las habitaciones: " + e.getMessage());
+        }
+    }
+
 
     private Habitacion mostrarFormulario(Habitacion habitacion, Boolean editar) {
         try {
@@ -132,41 +144,30 @@ TabConsultaHabitacionesController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        Platform.runLater(() -> {
-            // Configurar las columnas de la tabla
-            colNumeroHabitacion.setCellValueFactory(new PropertyValueFactory<>("numero"));
-            colTipoHabitacion.setCellValueFactory(new PropertyValueFactory<>("descripcionTipo"));
-            colPrecioHabitacion.setCellValueFactory(new PropertyValueFactory<>("precio"));
-            colIDHabitacion.setCellValueFactory(new PropertyValueFactory<>("id"));
+        configurarColumnasTabla();
+        cargarHabitacionesDesdeBD();
+    }
 
-            // Agregar datos de ejemplo
-            listaHabitaciones.addAll(
-                    new Habitacion(1, 101, 1, 1, 150.0, 2),
-                    new Habitacion(2, 102, 2, 1, 100.0, 2),
-                    new Habitacion(3, 201, 1, 1, 200.0, 4),
-                    new Habitacion(4, 202, 2, 1, 120.0, 3)
-            );
-            tblHabitaciones.setItems(listaHabitaciones);
-        });
+    private void configurarColumnasTabla() {
+        colIDHabitacion.setCellValueFactory(new PropertyValueFactory<>("id"));
+        colNumeroHabitacion.setCellValueFactory(new PropertyValueFactory<>("numero"));
+        colTipoHabitacion.setCellValueFactory(new PropertyValueFactory<>("descripcionTipo"));
+        colPrecioHabitacion.setCellValueFactory(new PropertyValueFactory<>("precio"));
     }
 
     @FXML
     public void buscarHabitacion(ActionEvent actionEvent) {
         try {
-            String criterio = txtFiltroHabitaciones.getText().trim().toLowerCase();
-            if (criterio.isEmpty()) {
-                tblHabitaciones.setItems(listaHabitaciones);
+            String textoBusqueda = txtFiltroHabitaciones.getText().trim();
+
+            if (textoBusqueda.isEmpty()) {
+                cargarHabitacionesDesdeBD();
                 return;
             }
+            listaHabitaciones.clear();
+            listaHabitaciones.addAll(habitacionLogica.findAllByParameters(textoBusqueda));
+            tblHabitaciones.setItems(listaHabitaciones);
 
-            ObservableList<Habitacion> filtradas = listaHabitaciones.stream()
-                    .filter(h -> String.valueOf(h.getNumero()).toLowerCase().contains(criterio) ||
-                            h.getDescripcionTipo().toLowerCase().contains(criterio) ||
-                            String.valueOf(h.getPrecio()).toLowerCase().contains(criterio))
-                    .collect(Collectors.toCollection(FXCollections::observableArrayList));
-
-
-            tblHabitaciones.setItems(filtradas);
         } catch (Exception error) {
             mostrarAlerta("Error buscando la habitación", error.getMessage());
         }

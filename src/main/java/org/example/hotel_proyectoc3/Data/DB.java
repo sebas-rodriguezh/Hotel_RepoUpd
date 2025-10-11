@@ -35,6 +35,7 @@ public class DB {
             config.setMinimumIdle(2); //Conexión dure 2 min.
             config.setConnectionTimeout(10000);
             config.setMaxLifetime(1800000);
+            ds = new HikariDataSource(config);
         }
         catch (Exception e) {
             throw new RuntimeException("No se pudo iniciar el pool de conexiones", e);

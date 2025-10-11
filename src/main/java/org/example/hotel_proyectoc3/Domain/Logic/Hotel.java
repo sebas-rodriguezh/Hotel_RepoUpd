@@ -14,7 +14,7 @@ public class Hotel {
     private GestorClientes clientes;
     private GestorPersonal trabajadores;
     private GestorReservaciones reservaciones;
-    private GestorHabitaciones habitaciones;
+    private HabitacionLogica habitaciones;
 
     //En este caso el hotel solo cuenta con un elemento de los siguientes atributos, por eso mantiene una referencia simple a una instancia.
     private Parqueo parqueo;
@@ -26,14 +26,14 @@ public class Hotel {
         this.clientes = new GestorClientes();
         this.trabajadores = new GestorPersonal();
         this.reservaciones = new GestorReservaciones();
-        this.habitaciones = new GestorHabitaciones();
+        this.habitaciones = new HabitacionLogica();
 
         this.parqueo = new Parqueo();
         this.bitacoraLimpieza = new BitacoraLimpieza();
         this.bitacoraMantenimiento = new BitacoraMantenimiento();
     }
 
-    private Hotel(GestorClientes clientes, GestorPersonal trabajadores, GestorReservaciones reservaciones, GestorHabitaciones habitaciones) {
+    private Hotel(GestorClientes clientes, GestorPersonal trabajadores, GestorReservaciones reservaciones, HabitacionLogica habitaciones) {
         this.clientes = clientes;
         this.trabajadores = trabajadores;
         this.reservaciones = reservaciones;
@@ -54,7 +54,7 @@ public class Hotel {
 
     // Método estático para obtener la instancia única con parámetros (opcional)
     public static Hotel getInstance(GestorClientes clientes, GestorPersonal trabajadores,
-                                    GestorReservaciones reservaciones, GestorHabitaciones habitaciones) {
+                                    GestorReservaciones reservaciones, HabitacionLogica habitaciones) {
         if (instance == null) {
             instance = new Hotel(clientes, trabajadores, reservaciones, habitaciones);
         }
@@ -91,11 +91,11 @@ public class Hotel {
         this.reservaciones = reservaciones;
     }
 
-    public GestorHabitaciones getHabitaciones() {
+    public HabitacionLogica getHabitaciones() {
         return habitaciones;
     }
 
-    public void setHabitaciones(GestorHabitaciones habitaciones) {
+    public void setHabitaciones(HabitacionLogica habitaciones) {
         this.habitaciones = habitaciones;
     }
 

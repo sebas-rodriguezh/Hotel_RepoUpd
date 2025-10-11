@@ -18,6 +18,7 @@ import org.example.hotel_proyectoc3.Domain.Logic.ClienteLogica;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
@@ -36,19 +37,16 @@ public class TabConsultaClientesController implements Initializable {
     @FXML private TableView <Cliente> tblClientes;
 
     private final ObservableList<Cliente> listaClientes = FXCollections.observableArrayList(); //Esta es la que debe de veni  de logica y repo.
-
-    private static final String RUTA_CLIENTE = java.nio.file.Paths.get(System.getProperty("user.dir"),"bd","clientes.xml").toString();
-    private final ClienteLogica clienteLogica = new ClienteLogica(RUTA_CLIENTE);
+    private final ClienteLogica clienteLogica = new ClienteLogica();
 
 
 
 
 
     @FXML
-    public void insertarCliente(ActionEvent actionEvent) {
+    public void insertarCliente(ActionEvent actionEvent) throws SQLException {
         Cliente nuevoCliente = mostrarFormulario(null, Boolean.valueOf(false)); //Llamamos los datos de la nueva pestaña formulario-cliente-view.fxml
         if (nuevoCliente != null) {
-            nuevoCliente.setId(listaClientes.getLast().getId() + 1);
 
             for (Cliente c: listaClientes)
             {
@@ -57,10 +55,11 @@ public class TabConsultaClientesController implements Initializable {
                     return;
                 }
             }
-            //Primero enviamos a escribir a la base de datos.
-            clienteLogica.create(nuevoCliente);
-            //Luego cargamos la información en memoria.
-            listaClientes.add(nuevoCliente);
+
+            Cliente clienteConId = clienteLogica.create(nuevoCliente);
+            if (clienteConId != null) {
+                listaClientes.add(clienteConId);
+            }
         }
     }
 
@@ -100,7 +99,7 @@ public class TabConsultaClientesController implements Initializable {
     }
 
     @FXML
-    public void modificarClienteSeleccionado(ActionEvent actionEvent) {
+    public void modificarClienteSeleccionado(ActionEvent actionEvent) throws SQLException {
         Cliente clienteSeleccionado = tblClientes.getSelectionModel().getSelectedItem();
 
         if (clienteSeleccionado == null) {
@@ -130,7 +129,7 @@ public class TabConsultaClientesController implements Initializable {
             listaClientes.remove(clienteSeleccionado);
         }
 
-        catch (Error error) {
+        catch (Error | SQLException error) {
             mostrarAlerta("Error eliminando el cliente", error.getMessage());
         }
     }
@@ -142,14 +141,11 @@ public class TabConsultaClientesController implements Initializable {
         colNombreCliente.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         colIdentificacionCliente.setCellValueFactory(new PropertyValueFactory<>("identificacion"));
 
-        listaClientes.addAll(
-                new Cliente(1111, "12345", "Sebas", "Rodriguez", LocalDate.of(2001,12,18)),
-                new Cliente(2222, "54332", "Celeste", "Chinchilla", LocalDate.of(2002,11,20)),
-                new Cliente(3333, "224354", "Leticia", "Hernandez", LocalDate.of(1997,7,6)),
-                new Cliente(4444, "454434", "Minor", "Rodriguez", LocalDate.of(1992,6,15))
-        );
-
-        listaClientes.addAll(clienteLogica.findAll());
+        try {
+            listaClientes.addAll(clienteLogica.findAll());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         tblClientes.setItems(listaClientes);
 
     }
@@ -163,14 +159,14 @@ public class TabConsultaClientesController implements Initializable {
                 return;
             }
 
-//            ObservableList<Cliente> filtrados = listaClientes.stream()
-//                    .filter(c -> c.getIdentificacion().toLowerCase().contains(criterio)
-//                            || c.getNombre().toLowerCase().contains(criterio)
-//                            || c.getPrimerApellido().toLowerCase().contains(criterio))
-//                    .collect(Collectors.toCollection(FXCollections::observableArrayList));
+            ObservableList<Cliente> filtrados = listaClientes.stream()
+                    .filter(c -> c.getIdentificacion().toLowerCase().contains(criterio)
+                            || c.getNombre().toLowerCase().contains(criterio)
+                            || c.getPrimerApellido().toLowerCase().contains(criterio))
+                    .collect(Collectors.toCollection(FXCollections::observableArrayList));
 
 
-            listaClientes.addAll(clienteLogica.findAllByParameters(criterio));
+            //listaClientes.addAll(clienteLogica.findAllByParameters(criterio));
             tblClientes.setItems(listaClientes);
 
         } catch (Exception error) {

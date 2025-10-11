@@ -1,92 +1,129 @@
 package org.example.hotel_proyectoc3.Data;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.Unmarshaller;
+import com.mysql.cj.xdevapi.Client;
+import org.example.hotel_proyectoc3.Domain.Model.Cliente;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Objects;
-
-//Se necesitan las 3 clases para cada Entidad que querramos guardar.
-//Esta clase es la que gestiona la Base de Datos (El archivo XML) para la entidad Cliente.
 public class ClienteDatos {
+    public List<Cliente> findAll() throws SQLException {
+        //Construir el query que se ejecuta en MySQL
+        String sql = "Select * from cliente ORDER BY id"; //Auto incremental y primary-key.
+        //String sqlAlternativo = "Select * from cliente where nombre = 'Juan'";
 
-    private final Path xmlPath;
-    private JAXBContext ctx; //Contexto del archivo.
-    private ClienteConector cache;
+        //Conectamos a la base de datos.
 
-    public ClienteDatos(String filePath) {
-        try {
-            this.xmlPath = Path.of(Objects.requireNonNull(filePath));
-            this.ctx = JAXBContext.newInstance(ClienteConector.class, ClienteEntity.class);
-        }
-        catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+        try (Connection cn = DB.getConnection(); //1. Conexión.
+        PreparedStatement ps = cn.prepareStatement(sql); //2. Preparar la sentencia SQL.
+        ResultSet rs = ps.executeQuery())  //3. Ejecutar la setencia.
+        {
+            List<Cliente> list = new ArrayList<>();
+            while (rs.next()) {
+                list.add(new Cliente(
+                      rs.getInt("id"),
+                        rs.getString("identificacion"),
+                        rs.getString("nombre"),
+                        rs.getString("primerApellido"),
+                        rs.getDate("fechaNacimiento").toLocalDate()
+                ));
+            }
+            return list;
         }
     }
 
-    //Abre el archivo.
-    public synchronized ClienteConector load() { //Cada vez que haya un upd, lo pueda sync y llevarlo a presentación.
-        try {
-            if (cache != null) {
-                return cache;
+    public Cliente findById(int id) throws SQLException {
+        String sql = "Select * from Cliente where id = "+ id;
+
+        try (Connection cn = DB.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            Cliente encontrado = null;
+            if (rs.next()) {
+                encontrado = new Cliente(
+                        rs.getInt("id"),
+                        rs.getString("identificacion"),
+                        rs.getString("nombre"),
+                        rs.getString("primerApellido"),
+                        rs.getDate("fechaNacimiento").toLocalDate()
+                );
             }
+            return encontrado;
+        }
+    }
 
-            if (!Files.exists(xmlPath)) {
-                cache = new ClienteConector();
-                save(cache); //Crea un archivo vacío.
-                return cache;
+    public Cliente insert(Cliente cliente) throws SQLException {
+        String sql = "INSERT INTO cliente (nombre, primerApellido, segundoApellido, identificacion, fechaNacimiento) VALUES (?, ?, ?, ?, ?)";
+        try (Connection cn = DB.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql,
+                     Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, cliente.getNombre());
+            ps.setString(2, cliente.getPrimerApellido());
+            ps.setString(3, cliente.getSegundoApellido());
+            ps.setString(4, cliente.getIdentificacion());
+            ps.setDate(5, Date.valueOf(cliente.getFechaNacimiento()));
+            ps.executeUpdate();
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (keys.next()) {
+                    cliente.setId(keys.getInt(1));
+                    return cliente;
+                }
             }
+            return null;
+        }
+    }
 
-            //Convierte XML a Java.
-            Unmarshaller u = ctx.createUnmarshaller(); //Convertidor.
-
-            //Gestiona la información convertida del archivo XML.
-            cache = (ClienteConector) u.unmarshal(xmlPath.toFile()); //Tiene que convertir.
-
-            //Esto es si el archivo está vacío.
-            if (cache.getClientes() == null)
+    public Cliente update(Cliente cliente) throws SQLException {
+        String sql = "UPDATE cliente set nombre = ?, primerApellido = ?, segundoApellido = ?, identificacion = ? WHERE id = ?";
+        try (Connection cn = DB.getConnection();
+        PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setString(1, cliente.getNombre());
+            ps.setString(2, cliente.getPrimerApellido());
+            ps.setString(3, cliente.getSegundoApellido());
+            ps.setString(4, cliente.getIdentificacion());
+            ps.setInt(5, cliente.getId());
+            if (ps.executeUpdate() > 0)
             {
-                //Aquí creamos una primera instancia de clientes dentro del archivo.
-                //Esto se aplicaría la primera vez que se corre el sistema.
-                //o cuando se limpia la información de BD.
-                cache.setClientes(new java.util.ArrayList<>());
-
+                return cliente; 
             }
-            return cache;
-        }
-        catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            return null;
         }
     }
 
-    //Cargar los datos.
-    public synchronized void save(ClienteConector data) {
-        try {
-            Marshaller m = ctx.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,Boolean.TRUE); //Convertimos todas las propiedas sí o sí.
-            m.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
-
-            File out = xmlPath.toFile(); //Tome el XML path y hagalo archivo.
-            File parent = out.getParentFile();
-
-            if (parent != null) parent.mkdirs();
-
-            java.io.StringWriter sw = new java.io.StringWriter();
-            m.marshal(data, sw); //Pasa los datos a escritura.
-            m.marshal(data, out); //Escribe los datos en el archivo.
-
-            cache = data;
-        }
-
-        catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+    public int delete(int id) throws SQLException {
+        String sql = "DELETE FROM cliente WHERE id = " + id;
+        try (Connection cn = DB.getConnection();
+        PreparedStatement ps = cn.prepareStatement(sql)) {
+            return ps.executeUpdate();
         }
     }
 
-    public  Path getXmlPath() {
-        return xmlPath;
+    public List<Cliente> findAllByParameters(String text) throws SQLException {
+        String sql = "SELECT * FROM cliente WHERE nombre LIKE ? OR identificacion LIKE ? OR primerApellido LIKE ? OR segundoApellido LIKE ?";
+
+        try (Connection conn = DB.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            String buscar = "%" + text + "%";
+            stmt.setString(1, buscar);
+            stmt.setString(2, buscar);
+            stmt.setString(3, buscar);
+            stmt.setString(4, buscar);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                List<Cliente> clientes = new ArrayList<>();
+                while (rs.next()) {
+                    clientes.add(new Cliente(
+                            rs.getInt("id"),
+                            rs.getString("identificacion"),
+                            rs.getString("nombre"),
+                            rs.getString("primerApellido"),
+                            rs.getDate("fechaNacimiento").toLocalDate()
+                    ));
+                }
+                return clientes;
+            }
+        }
     }
+
 }

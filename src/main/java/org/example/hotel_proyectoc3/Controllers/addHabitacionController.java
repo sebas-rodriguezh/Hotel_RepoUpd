@@ -5,6 +5,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import org.example.hotel_proyectoc3.Domain.Logic.HabitacionLogica;
+import org.example.hotel_proyectoc3.Domain.Logic.Hotel;
 import org.example.hotel_proyectoc3.Domain.Model.Habitacion;
 
 import java.net.URL;
@@ -26,6 +28,8 @@ public class addHabitacionController implements Initializable {
     private Habitacion habitacion;
     private Boolean modificacion = false;
 
+    private final HabitacionLogica  habitacionLogica = Hotel.getInstance().getHabitaciones();
+
     @FXML
     public void guardarHabitacion(ActionEvent actionEvent) {
         try {
@@ -39,30 +43,45 @@ public class addHabitacionController implements Initializable {
                 return;
             }
 
-            // Convertir valores
             int numero = Integer.parseInt(numeroText);
             double precio = Double.parseDouble(precioText);
             int capacidad = spinnerCapacidadHabitacion.getValue();
 
-            // Convertir selecciones a códigos numéricos
             int tipo = convertirTipoACodigo(tipoSeleccionado);
             int estado = convertirEstadoACodigo(estadoSeleccionado);
 
+            Habitacion resultado = null;
+
             if (!modificacion) {
-                // Usar el constructor sin ID (para auto-incremental)
-                habitacion = new Habitacion(numero, tipo, estado, precio, capacidad);
+                // Crear nueva habitación
+                Habitacion nuevaHabitacion = new Habitacion(numero, tipo, estado, precio, capacidad);
+                resultado = habitacionLogica.create(nuevaHabitacion);
+
+                if (resultado != null) {
+                    mostrarAlerta("Éxito", "Habitación creada correctamente con ID: " + resultado.getId());
+                } else {
+                    mostrarAlerta("Error", "No se pudo crear la habitación");
+                    return;
+                }
             } else {
-                // En modificación, mantener el ID existente
+                // Modificar habitación existente
                 habitacion.setNumero(numero);
                 habitacion.setTipo(tipo);
                 habitacion.setEstado(estado);
                 habitacion.setPrecio(precio);
                 habitacion.setCapacidad(capacidad);
-                // Las descripciones se actualizan automáticamente en los setters
-            }
 
+                resultado = habitacionLogica.update(habitacion);
+
+                if (resultado != null) {
+                    mostrarAlerta("Éxito", "Habitación actualizada correctamente");
+                } else {
+                    mostrarAlerta("Error", "No se pudo actualizar la habitación");
+                    return;
+                }
+            }
             Stage stage = (Stage) btnGuardarHabitacion.getScene().getWindow();
-            stage.setUserData(habitacion);
+            stage.setUserData(resultado);
             stage.close();
 
         } catch (NumberFormatException e) {
@@ -71,7 +90,6 @@ public class addHabitacionController implements Initializable {
             mostrarAlerta("Error guardando los datos", e.getMessage());
         }
     }
-
 
     private Boolean camposInvalidos(String numero, String precio, String tipo, String estado) {
         return numero.isEmpty() || precio.isEmpty() || tipo == null || estado == null;

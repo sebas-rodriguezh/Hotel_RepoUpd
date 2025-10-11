@@ -7,9 +7,10 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import org.example.hotel_proyectoc3.Domain.Logic.ClienteLogica;
+import org.example.hotel_proyectoc3.Domain.Logic.HabitacionLogica;
 import org.example.hotel_proyectoc3.Domain.Logic.Hotel;
 import org.example.hotel_proyectoc3.Domain.Model.Habitacion;
-import org.example.hotel_proyectoc3.Domain.Logic.GestorHabitaciones;
 
 import java.net.URL;
 import java.util.List;
@@ -30,24 +31,10 @@ public class BuscarHabitacionController implements Initializable {
     @FXML private TableColumn<Habitacion, Integer> colIDHabitacion;
     @FXML private TableView<Habitacion> tbvResultadoBusquedaHabitacion;
 
-    private final GestorHabitaciones gestorHabitaciones = Hotel.getInstance().getHabitaciones();
+    private final HabitacionLogica gestorHabitaciones = Hotel.getInstance().getHabitaciones();
     private Habitacion habitacionSeleccionada;
 
-    public BuscarHabitacionController() {
-        Habitacion hab1 = new Habitacion(1, 101, 1, 1, 150000.0, 2);
-        Habitacion hab2 = new Habitacion(2, 102, 2, 1, 250000.0, 4);
-        Habitacion hab3 = new Habitacion(3, 201, 1, 2, 150000.0, 2);
-        Habitacion hab4 = new Habitacion(4, 202, 2, 3, 250000.0, 3);
-        Habitacion hab5 = new Habitacion(5, 301, 1, 4, 180000.0, 2);
-        Habitacion hab6 = new Habitacion(6, 302, 2, 5, 300000.0, 5);
 
-        gestorHabitaciones.insertarHabitacion(hab1);
-        gestorHabitaciones.insertarHabitacion(hab2);
-        gestorHabitaciones.insertarHabitacion(hab3);
-        gestorHabitaciones.insertarHabitacion(hab4);
-        gestorHabitaciones.insertarHabitacion(hab5);
-        gestorHabitaciones.insertarHabitacion(hab6);
-    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -80,7 +67,7 @@ public class BuscarHabitacionController implements Initializable {
 
     private void cargarTodasLasHabitaciones() {
         try {
-            List<Habitacion> habitaciones = gestorHabitaciones.getHabitaciones();
+            List<Habitacion> habitaciones = gestorHabitaciones.findAvailableRooms();
             tbvResultadoBusquedaHabitacion.setItems(FXCollections.observableArrayList(habitaciones));
         } catch (Exception e) {
             mostrarAlerta("Error", "Error al cargar las habitaciones: " + e.getMessage());
@@ -97,7 +84,7 @@ public class BuscarHabitacionController implements Initializable {
             String filtro = texto.toLowerCase().trim();
             String tipo = comboBoxFiltro.getValue();
 
-            List<Habitacion> filtradas = gestorHabitaciones.getHabitaciones().stream()
+            List<Habitacion> filtradas = gestorHabitaciones.findAll().stream()
                     .filter(h -> switch (tipo) {
                         case "ID" -> String.valueOf(h.getId()).contains(filtro);
                         case "Número" -> String.valueOf(h.getNumero()).contains(filtro);
@@ -131,10 +118,8 @@ public class BuscarHabitacionController implements Initializable {
         }
 
         try {
-            // Aquí puedes agregar la lógica para pasar la habitación seleccionada al controlador padre
-            // if (controllerPadre != null) {
-            //     controllerPadre.setHabitacionSeleccionada(habitacionSeleccionada);
-            // }
+            Stage stage = (Stage) comboBoxFiltro.getScene().getWindow();
+            stage.setUserData(habitacionSeleccionada);
             cerrarVentana();
         } catch (Exception e) {
             mostrarAlerta("Error", "Error al seleccionar habitación: " + e.getMessage());
@@ -157,4 +142,5 @@ public class BuscarHabitacionController implements Initializable {
     public Habitacion getHabitacionSeleccionada() {
         return habitacionSeleccionada;
     }
+
 }
