@@ -13,6 +13,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.example.hotel_proyectoc3.Domain.Logic.Hotel;
 import org.example.hotel_proyectoc3.Domain.Model.Cliente;
 import org.example.hotel_proyectoc3.Domain.Logic.ClienteLogica;
 
@@ -37,7 +38,7 @@ public class TabConsultaClientesController implements Initializable {
     @FXML private TableView <Cliente> tblClientes;
 
     private final ObservableList<Cliente> listaClientes = FXCollections.observableArrayList(); //Esta es la que debe de veni  de logica y repo.
-    private final ClienteLogica clienteLogica = new ClienteLogica();
+    private final ClienteLogica clienteLogica = Hotel.getInstance().getClientes();
 
 
 

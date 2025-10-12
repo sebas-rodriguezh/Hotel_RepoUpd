@@ -7,6 +7,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import org.example.hotel_proyectoc3.Domain.Logic.ClienteLogica;
 import org.example.hotel_proyectoc3.Domain.Logic.Hotel;
 import org. example.hotel_proyectoc3.Domain.Model.Cliente;
 import org.example.hotel_proyectoc3.Domain.Logic.GestorClientes;
@@ -30,27 +31,9 @@ public class BuscarClienteController implements Initializable {
     @FXML private TableColumn<Cliente, String> colIDCliente;
     @FXML private TableView<Cliente> tbvResultadoBCliente;
 
-    private final GestorClientes gestorClientes = Hotel.getInstance().getClientes();
+    private final ClienteLogica gestorClientes = Hotel.getInstance().getClientes();
     private Cliente ClienteSeleccionado;
-    //private TabPrescibirController controllerPadre;
 
-    public BuscarClienteController() {
-        Cliente client1 = new Cliente(1001, "1234", "Juan", "Herrera", LocalDate.of(1990, 5, 15));
-        Cliente client2 = new Cliente(1002, "2345", "Maria", "Gonzalez", LocalDate.of(1985, 8, 22));
-        Cliente client3 = new Cliente(1003, "3456", "Carlos", "Martinez", LocalDate.of(1998, 3, 10));
-        Cliente client4 = new Cliente(1004, "4567", "Ana", "Lopez", LocalDate.of(1992, 11, 30));
-        Cliente client5 = new Cliente(1005, "5678", "Luis", "Ramirez", LocalDate.of(1987, 7, 18));
-
-        gestorClientes.insertarCliente(client1,false);
-        gestorClientes.insertarCliente(client2,false);
-        gestorClientes.insertarCliente(client3,false);
-        gestorClientes.insertarCliente(client4,false);
-        gestorClientes.insertarCliente(client5,false);
-    }
-
-//    public void setControllerPadre(TabPrescibirController controller) {
-//        this.controllerPadre = controller;
-//    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -80,7 +63,7 @@ public class BuscarClienteController implements Initializable {
 
     private void cargarTodosLosClientes() {
         try {
-            List<Cliente> Clientes = gestorClientes.getClientes(); //Cae del bd por ahora vacío.
+            List<Cliente> Clientes = gestorClientes.findAll(); //Cae del bd por ahora vacío.
             tbvResultadoBCliente.setItems(FXCollections.observableArrayList(Clientes));
         } catch (Exception e) {
             mostrarAlerta("Error", "Error al cargar los Clientes: " + e.getMessage());
@@ -97,7 +80,7 @@ public class BuscarClienteController implements Initializable {
             String filtro = texto.toLowerCase().trim();
             String tipoFiltro = comboBoxFiltro.getValue();
 
-            List<Cliente> todosLosClientes = gestorClientes.getClientes();
+            List<Cliente> todosLosClientes = gestorClientes.findAll();
             List<Cliente> filtrados = todosLosClientes.stream()
                     .filter(p -> {
                         switch (tipoFiltro) {

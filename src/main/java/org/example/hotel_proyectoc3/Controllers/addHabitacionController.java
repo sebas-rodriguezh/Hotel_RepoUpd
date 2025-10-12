@@ -113,11 +113,19 @@ public class addHabitacionController implements Initializable {
         this.modificacion = editar;
 
         if (editar && habitacion != null) {
+            txtNumeroHabitacion.setDisable(true);
             txtNumeroHabitacion.setText(String.valueOf(habitacion.getNumero()));
             txtPrecio.setText(String.valueOf(habitacion.getPrecio()));
             spinnerCapacidadHabitacion.getValueFactory().setValue(habitacion.getCapacidad());
             comboBoxTipoHabitacion.setValue(Habitacion.convertirCodigoATipo(habitacion.getTipo()));
             comboBoxEstadoHabitacion.setValue(Habitacion.convertirCodigoAEstado(habitacion.getEstado()));
+            if (habitacion.getEstado() == 3)
+            {
+                comboBoxEstadoHabitacion.setDisable(true);
+            } else {
+                comboBoxEstadoHabitacion.setDisable(false);
+
+            }
         }
     }
 

@@ -1,20 +1,31 @@
 package org.example.hotel_proyectoc3.Controllers;
 
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.example.hotel_proyectoc3.Domain.Logic.Hotel;
+import org.example.hotel_proyectoc3.Domain.Logic.ReservacionLogica;
 import org.example.hotel_proyectoc3.Domain.Model.Cliente;
+import org.example.hotel_proyectoc3.Domain.Model.Habitacion;
 import org.example.hotel_proyectoc3.Domain.Model.Reservacion;
 
 import java.io.IOException;
+import java.net.URL;
 import java.time.LocalDate;
+import java.util.ResourceBundle;
 
-public class TabConsultaReservacionesController {
+public class TabConsultaReservacionesController implements Initializable {
     @FXML private Button btnBorrarReserva;
     @FXML private Button btnModificarReserva;
     @FXML private Button btnInsertarReserva;
@@ -29,9 +40,29 @@ public class TabConsultaReservacionesController {
     @FXML private TextField txtBusquedaReserva;
     @FXML private ComboBox <String> comboBoxCriteroFiltro;
 
+    private final ObservableList<Reservacion> listaReservaciones = FXCollections.observableArrayList();
+    private final ReservacionLogica reservacionLogica = Hotel.getInstance().getReservaciones();
 
     @FXML
     public void borrarReserva(ActionEvent actionEvent) {
+        try {
+            Reservacion reservacionSeleccionada = tbvResultadoBusquedaReservacion.getSelectionModel().getSelectedItem();
+            if (reservacionSeleccionada == null) {
+                mostrarAlerta("Error", "Seleccione una reservación para eliminar");
+                return;
+            }
+            reservacionSeleccionada.getHabitacion().setEstado(1);
+            Hotel.getInstance().getHabitaciones().update(reservacionSeleccionada.getHabitacion());
+            boolean eliminado = reservacionLogica.deleteById(reservacionSeleccionada.getIdReservacion());
+            if (eliminado) {
+                cargarReservaciones();
+                mostrarAlerta("Éxito", "Reservación eliminada");
+            } else {
+                mostrarAlerta("Error", "No se pudo eliminar la reservación");
+            }
+        } catch (Exception e) {
+            mostrarAlerta("Error", "Error al eliminar: " + e.getMessage());
+        }
     }
 
 
@@ -57,7 +88,7 @@ public class TabConsultaReservacionesController {
             stage.setScene(new Scene(root)); //Es inicio-view.fxml
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.showAndWait();
-
+            cargarReservaciones();
             //return (Cliente) stage.getUserData(); //De este Stage, voy a traerme lo que trajo el llenado de la otra pestaña y construyo los datos.
         } catch (IOException error) {
             mostrarAlerta("Error abriendo el formulario", error.getMessage());
@@ -67,7 +98,16 @@ public class TabConsultaReservacionesController {
 
     @FXML
     public void buscarReserva(ActionEvent actionEvent) {
-
+        try {
+            String texto = txtBusquedaReserva.getText().trim();
+            if (texto.isEmpty()) {
+                cargarReservaciones();
+            } else {
+                listaReservaciones.setAll(reservacionLogica.findAllByParameters(texto));
+            }
+        } catch (Exception e) {
+            mostrarAlerta("Error", "Error en búsqueda: " + e.getMessage());
+        }
     }
 
     private void mostrarAlerta(String titulo, String mensaje) {
@@ -78,4 +118,34 @@ public class TabConsultaReservacionesController {
         alert.showAndWait();
     }
 
+    private void cargarReservaciones() {
+        try {
+            listaReservaciones.setAll(reservacionLogica.findAll());
+        } catch (Exception e) {
+            mostrarAlerta("Error", "Error cargando reservaciones: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        configurarTabla();
+        cargarReservaciones();
+
+        comboBoxCriteroFiltro.getItems().addAll("Todos", "Por Cliente", "Por Habitación");
+        comboBoxCriteroFiltro.setValue("Todos");
+
+        tbvResultadoBusquedaReservacion.setItems(listaReservaciones);
+    }
+
+
+    private void configurarTabla() {
+        idReservacion.setCellValueFactory(new PropertyValueFactory<>("idReservacion"));
+        colNombreCliente.setCellValueFactory(cellData ->
+                new SimpleStringProperty(cellData.getValue().getCliente().getNombre()));
+        colNumeroHabitacion.setCellValueFactory(cellData ->
+                new SimpleIntegerProperty(cellData.getValue().getHabitacion().getNumero()).asObject());
+        colFechaLlegada.setCellValueFactory(new PropertyValueFactory<>("fechaLlegada"));
+        colFechaSalida.setCellValueFactory(new PropertyValueFactory<>("fechaSalida"));
+        colPrecioTotalReservacion.setCellValueFactory(new PropertyValueFactory<>("precioTotal"));
+    }
 }

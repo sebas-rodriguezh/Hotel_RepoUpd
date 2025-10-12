@@ -6,7 +6,6 @@ public class Reservacion {
     private Habitacion habitacion;
     private Cliente cliente;
     private int idReservacion;
-    private LocalDate fechaReservacion;
     private LocalDate fechaLlegada;
     private int cantidadDeNoches;
     private LocalDate fechaSalida;
@@ -51,14 +50,6 @@ public class Reservacion {
 
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
-    }
-
-    public LocalDate getFechaReservacion() {
-        return fechaReservacion;
-    }
-
-    public void setFechaReservacion(LocalDate fechaReservacion) {
-        this.fechaReservacion = fechaReservacion;
     }
 
     public int getIdReservacion() {

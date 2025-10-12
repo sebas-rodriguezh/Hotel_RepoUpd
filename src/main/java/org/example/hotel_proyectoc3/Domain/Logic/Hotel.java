@@ -2,7 +2,10 @@ package org.example.hotel_proyectoc3.Domain.Logic;
 
 import org.example.hotel_proyectoc3.Domain.Model.BitacoraLimpieza;
 import org.example.hotel_proyectoc3.Domain.Model.BitacoraMantenimiento;
+import org.example.hotel_proyectoc3.Domain.Model.Cliente;
 import org.example.hotel_proyectoc3.Domain.Model.Parqueo;
+
+import java.util.List;
 
 //El hotel es el controlador que se encarga de algunas interacciones del sistema. Sin generar dependencias.
 //Importante que el hotel mantenga referencias a todas las grandes colecciones, y que tenga un control generalizado de todo lo que lo compone.
@@ -11,9 +14,9 @@ public class Hotel {
     private static Hotel instance;
 
     //Listas (Es como si fueran las bases de datos que controla el Hotel).
-    private GestorClientes clientes;
+    private ClienteLogica clientes;
     private GestorPersonal trabajadores;
-    private GestorReservaciones reservaciones;
+    private ReservacionLogica reservaciones;
     private HabitacionLogica habitaciones;
 
     //En este caso el hotel solo cuenta con un elemento de los siguientes atributos, por eso mantiene una referencia simple a una instancia.
@@ -23,9 +26,9 @@ public class Hotel {
 
     // Constructor privado para prevenir instanciación externa
     private Hotel() {
-        this.clientes = new GestorClientes();
+        this.clientes = new ClienteLogica();
         this.trabajadores = new GestorPersonal();
-        this.reservaciones = new GestorReservaciones();
+        this.reservaciones = new ReservacionLogica();
         this.habitaciones = new HabitacionLogica();
 
         this.parqueo = new Parqueo();
@@ -33,7 +36,7 @@ public class Hotel {
         this.bitacoraMantenimiento = new BitacoraMantenimiento();
     }
 
-    private Hotel(GestorClientes clientes, GestorPersonal trabajadores, GestorReservaciones reservaciones, HabitacionLogica habitaciones) {
+    private Hotel(ClienteLogica clientes, GestorPersonal trabajadores, ReservacionLogica reservaciones, HabitacionLogica habitaciones) {
         this.clientes = clientes;
         this.trabajadores = trabajadores;
         this.reservaciones = reservaciones;
@@ -53,8 +56,8 @@ public class Hotel {
     }
 
     // Método estático para obtener la instancia única con parámetros (opcional)
-    public static Hotel getInstance(GestorClientes clientes, GestorPersonal trabajadores,
-                                    GestorReservaciones reservaciones, HabitacionLogica habitaciones) {
+    public static Hotel getInstance(ClienteLogica clientes, GestorPersonal trabajadores,
+                                    ReservacionLogica reservaciones, HabitacionLogica habitaciones) {
         if (instance == null) {
             instance = new Hotel(clientes, trabajadores, reservaciones, habitaciones);
         }
@@ -67,11 +70,11 @@ public class Hotel {
     }
 
     // Getters y Setters (se mantienen igual)
-    public GestorClientes getClientes() {
+    public ClienteLogica getClientes() {
         return clientes;
     }
 
-    public void setClientes(GestorClientes clientes) {
+    public void setClientes(ClienteLogica clientes) {
         this.clientes = clientes;
     }
 
@@ -83,11 +86,11 @@ public class Hotel {
         this.trabajadores = trabajadores;
     }
 
-    public GestorReservaciones getReservaciones() {
+    public ReservacionLogica getReservaciones() {
         return reservaciones;
     }
 
-    public void setReservaciones(GestorReservaciones reservaciones) {
+    public void setReservaciones(ReservacionLogica reservaciones) {
         this.reservaciones = reservaciones;
     }
 

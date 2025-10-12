@@ -10,6 +10,9 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.example.hotel_proyectoc3.Domain.Logic.HabitacionLogica;
+import org.example.hotel_proyectoc3.Domain.Logic.Hotel;
+import org.example.hotel_proyectoc3.Domain.Logic.ReservacionLogica;
 import org.example.hotel_proyectoc3.Domain.Model.Cliente;
 import org.example.hotel_proyectoc3.Domain.Model.Habitacion;
 import org.example.hotel_proyectoc3.Domain.Model.Reservacion;
@@ -45,6 +48,10 @@ public class TabCrearReservacionController implements Initializable {
     Cliente clienteSeleccionado = null;
     Habitacion habitacionSeleccionada = null;
 
+    private final HabitacionLogica habitacionLogica = Hotel.getInstance().getHabitaciones();
+    private final ReservacionLogica reservacionLogica = Hotel.getInstance().getReservaciones();
+
+
     @FXML
     public void limpiarCamposReserva() {
         tbvResultadoBusquedaCliente.getItems().clear();
@@ -78,22 +85,14 @@ public class TabCrearReservacionController implements Initializable {
             {
                 Reservacion reservacion = new Reservacion(clienteSeleccionado, habitacionSeleccionada, fechaLlegada, cantidadNoches, oferta);
                 reservacion.setFechaSalida(fechaSalida);
+                Reservacion reservacionGuardada = reservacionLogica.create(reservacion);
 
-                // ✅ 2. Actualizar el estado de la habitación a "Reservada"
-                habitacionSeleccionada.setEstado(3); // 3 = Reservada
-
-                // ✅ 3. Guardar la reservación en la base de datos
-                // (Necesitarás ReservacionDatos similar a ClienteDatos)
-                // ReservacionDatos reservacionStore = new ReservacionDatos();
-                // reservacionStore.insert(reservacion);
-
-                // ✅ 4. Actualizar la habitación en la base de datos
-                // HabitacionDatos habitacionStore = new HabitacionDatos();
-                // habitacionStore.update(habitacionSeleccionada);
-
-
-                mostrarAlerta("Guardado", "Se guardó correctamente la reservación en el sistema.");
+                if (reservacionGuardada != null) {
+                    habitacionSeleccionada.setEstado(3);
+                    habitacionLogica.update(habitacionSeleccionada);
+                }
                 limpiarCamposReserva();
+                mostrarAlerta("Guardado", "Se guardó correctamente la reservación en el sistema.");
             }
             else {
                 mostrarAlerta("Error", "Todos los valores se requieren para poder guardar la reserva.");
