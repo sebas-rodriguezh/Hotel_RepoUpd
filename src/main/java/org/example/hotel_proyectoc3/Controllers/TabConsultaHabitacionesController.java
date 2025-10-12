@@ -22,6 +22,7 @@ import org.example.hotel_proyectoc3.Domain.Model.Habitacion;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
@@ -48,7 +49,6 @@ TabConsultaHabitacionesController implements Initializable {
         try {
             Habitacion nuevaHabitacion = mostrarFormulario(null, false);
             if (nuevaHabitacion != null) {
-                // Recargar datos desde la base de datos
                 cargarHabitacionesDesdeBD();
                 mostrarAlerta("Éxito", "Habitación creada correctamente");
             }
@@ -70,7 +70,6 @@ TabConsultaHabitacionesController implements Initializable {
             Habitacion modificada = mostrarFormulario(habitacionSeleccionada, true);
 
             if (modificada != null) {
-                // Recargar datos desde la base de datos
                 cargarHabitacionesDesdeBD();
                 mostrarAlerta("Éxito", "Habitación actualizada correctamente");
             }
@@ -153,23 +152,42 @@ TabConsultaHabitacionesController implements Initializable {
         colNumeroHabitacion.setCellValueFactory(new PropertyValueFactory<>("numero"));
         colTipoHabitacion.setCellValueFactory(new PropertyValueFactory<>("descripcionTipo"));
         colPrecioHabitacion.setCellValueFactory(new PropertyValueFactory<>("precio"));
+        comboBoxCriteroFiltro.setItems(FXCollections.observableArrayList("Número", "ID", "Capacidad", "Tipo", "Estado", "Disponible"));
+        comboBoxCriteroFiltro.setValue("ID");
+
     }
 
     @FXML
-    public void buscarHabitacion(ActionEvent actionEvent) {
+    public void buscarHabitacion(ActionEvent actionEvent) throws SQLException {
+        listaHabitaciones.clear();
+        if (txtFiltroHabitaciones == null || txtFiltroHabitaciones.getText().isEmpty()) {
+            listaHabitaciones.addAll(habitacionLogica.findAll());
+            return;
+        }
+
         try {
-            String textoBusqueda = txtFiltroHabitaciones.getText().trim();
+            String filtro = txtFiltroHabitaciones.getText().toLowerCase().trim();
+            String tipoFiltro = comboBoxCriteroFiltro.getValue();
 
-            if (textoBusqueda.isEmpty()) {
-                cargarHabitacionesDesdeBD();
-                return;
-            }
-            listaHabitaciones.clear();
-            listaHabitaciones.addAll(habitacionLogica.findAllByParameters(textoBusqueda));
-            tblHabitaciones.setItems(listaHabitaciones);
+            List<Habitacion> filtradas = habitacionLogica.findAll().stream()
+                    .filter(h -> switch (tipoFiltro) {
+                        case "ID" -> String.valueOf(h.getId()).contains(filtro);
+                        case "Número" -> String.valueOf(h.getNumero()).contains(filtro);
+                        case "Capacidad" -> String.valueOf(h.getCapacidad()).contains(filtro);
+                        case "Tipo" -> h.getDescripcionTipo().toLowerCase().contains(filtro);
+                        case "Estado" -> h.getDescripcionEstado().toLowerCase().contains(filtro);
+                        case "Disponible" -> (h.getDisponible() && filtro.matches(".*(sí|si).*")) ||
+                                (!h.getDisponible() && filtro.contains("no"));
+                        default -> String.valueOf(h.getNumero()).contains(filtro) ||
+                                String.valueOf(h.getId()).contains(filtro) ||
+                                h.getDescripcionTipo().toLowerCase().contains(filtro);
+                    })
+                    .collect(Collectors.toList());
 
-        } catch (Exception error) {
-            mostrarAlerta("Error buscando la habitación", error.getMessage());
+            listaHabitaciones.setAll(filtradas);
+        } catch (Exception e) {
+            mostrarAlerta("Error", "Error al filtrar Clientes: " + e.getMessage());
         }
     }
 }
+

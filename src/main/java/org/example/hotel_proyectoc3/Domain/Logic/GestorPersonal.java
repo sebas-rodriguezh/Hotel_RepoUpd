@@ -31,13 +31,11 @@ public class GestorPersonal {
         int id = personal.getId();
         String identificacion = personal.getIdentificacion();
 
-        // Validar que no exista alguien con los mismos credenciales
         if (respuestaLista ||
                 existeAlguienConEsosCredenciales(id, identificacion)) {
             return false;
         }
 
-        // Validaciones adicionales
         if (id <= 0) {
             return false;
         }
@@ -109,8 +107,6 @@ public class GestorPersonal {
                     personal.getId() == id &&
                     personal.getIdentificacion().equals(identificacion)) {
 
-                // Validaciones adicionales antes de eliminar
-                // (por ejemplo, verificar que no tenga responsabilidades activas)
                 if (puedeEliminarPersonal(personal)) {
                     listaPersonal.remove(i);
                     return true;
@@ -122,9 +118,6 @@ public class GestorPersonal {
     }
 
     private Boolean puedeEliminarPersonal(Personal personal) {
-        // Aquí puedes implementar validaciones específicas
-        // Por ejemplo, verificar que no tenga turnos activos, responsabilidades, etc.
-        // Por ahora retornamos true como placeholder
         return true;
     }
 

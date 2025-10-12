@@ -27,7 +27,6 @@ import java.util.ResourceBundle;
 
 public class TabConsultaReservacionesController implements Initializable {
     @FXML private Button btnBorrarReserva;
-    @FXML private Button btnModificarReserva;
     @FXML private Button btnInsertarReserva;
     @FXML private TableColumn <Reservacion, Double> colPrecioTotalReservacion;
     @FXML private TableColumn <Reservacion, LocalDate> colFechaSalida;
@@ -68,31 +67,17 @@ public class TabConsultaReservacionesController implements Initializable {
 
 
     @FXML
-    public void modificarReserva(ActionEvent actionEvent) {
-    }
-
-
-    @FXML
     public void insertarReserva(ActionEvent actionEvent) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/hotel_proyectoc3/UI/View/TabCrearReservacion.fxml"));
-            Parent root = loader.load(); //Se levanta la ventana y se dice ser padre.
-
-
-            //Vamos a llamar a la clase del FormularioClienteController, desde ahí seteamos la info recolectada del cliente que vamos a agregar.
-            //Para eso necesitamos el método respectivo en FormularioClienteController.
-//            addClienteController controller = loader.getController();
-//            controller.setCliente(client, editar);
-            Stage stage = new Stage(); //Voy a presentar la pestaña...
-            //stage.setTitle(editar ? "Modificar Cliente" : "Agregar Cliente");
-            stage.setScene(new Scene(root)); //Es inicio-view.fxml
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.showAndWait();
             cargarReservaciones();
-            //return (Cliente) stage.getUserData(); //De este Stage, voy a traerme lo que trajo el llenado de la otra pestaña y construyo los datos.
         } catch (IOException error) {
             mostrarAlerta("Error abriendo el formulario", error.getMessage());
-            //return null;
         }
     }
 

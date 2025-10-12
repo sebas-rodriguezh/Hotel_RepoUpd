@@ -7,24 +7,17 @@ import org.example.hotel_proyectoc3.Domain.Model.Parqueo;
 
 import java.util.List;
 
-//El hotel es el controlador que se encarga de algunas interacciones del sistema. Sin generar dependencias.
-//Importante que el hotel mantenga referencias a todas las grandes colecciones, y que tenga un control generalizado de todo lo que lo compone.
-public class Hotel {
-    // Instancia única del Singleton
-    private static Hotel instance;
 
-    //Listas (Es como si fueran las bases de datos que controla el Hotel).
+public class Hotel {
+    private static Hotel instance;
     private ClienteLogica clientes;
     private GestorPersonal trabajadores;
     private ReservacionLogica reservaciones;
     private HabitacionLogica habitaciones;
-
-    //En este caso el hotel solo cuenta con un elemento de los siguientes atributos, por eso mantiene una referencia simple a una instancia.
     private Parqueo parqueo;
     private BitacoraLimpieza bitacoraLimpieza;
     private BitacoraMantenimiento bitacoraMantenimiento;
 
-    // Constructor privado para prevenir instanciación externa
     private Hotel() {
         this.clientes = new ClienteLogica();
         this.trabajadores = new GestorPersonal();
@@ -47,7 +40,6 @@ public class Hotel {
         this.bitacoraMantenimiento = new BitacoraMantenimiento();
     }
 
-    // Método estático para obtener la instancia única (versión básica)
     public static Hotel getInstance() {
         if (instance == null) {
             instance = new Hotel();
@@ -55,7 +47,6 @@ public class Hotel {
         return instance;
     }
 
-    // Método estático para obtener la instancia única con parámetros (opcional)
     public static Hotel getInstance(ClienteLogica clientes, GestorPersonal trabajadores,
                                     ReservacionLogica reservaciones, HabitacionLogica habitaciones) {
         if (instance == null) {
@@ -64,12 +55,10 @@ public class Hotel {
         return instance;
     }
 
-    // Método para reiniciar la instancia (útil para testing)
     public static void resetInstance() {
         instance = null;
     }
 
-    // Getters y Setters (se mantienen igual)
     public ClienteLogica getClientes() {
         return clientes;
     }

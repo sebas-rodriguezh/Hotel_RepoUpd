@@ -6,11 +6,9 @@ import org.example.hotel_proyectoc3.Domain.Model.Cliente;
 import java.sql.SQLException;
 import java.util.List;
 
-//Este hace el CRUD haciendo el archivo. Base de datos SQL.
 public class ClienteLogica {
     private ClienteDatos store = new ClienteDatos();
 
-    //Funciones de lectura.
     public List<Cliente> findAll () throws SQLException {
         return store.findAll();
     }

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
@@ -37,16 +38,14 @@ public class TabConsultaClientesController implements Initializable {
     @FXML private TableColumn <Cliente, Integer> colIdCliente;
     @FXML private TableView <Cliente> tblClientes;
 
-    private final ObservableList<Cliente> listaClientes = FXCollections.observableArrayList(); //Esta es la que debe de veni  de logica y repo.
+    private final ObservableList<Cliente> listaClientes = FXCollections.observableArrayList();
     private final ClienteLogica clienteLogica = Hotel.getInstance().getClientes();
-
-
 
 
 
     @FXML
     public void insertarCliente(ActionEvent actionEvent) throws SQLException {
-        Cliente nuevoCliente = mostrarFormulario(null, Boolean.valueOf(false)); //Llamamos los datos de la nueva pestaña formulario-cliente-view.fxml
+        Cliente nuevoCliente = mostrarFormulario(null, Boolean.valueOf(false));
         if (nuevoCliente != null) {
 
             for (Cliente c: listaClientes)
@@ -68,20 +67,15 @@ public class TabConsultaClientesController implements Initializable {
     private Cliente mostrarFormulario(Cliente client, Boolean editar) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/hotel_proyectoc3/UI/View/ClienteFXML.fxml"));
-            Parent root = loader.load(); //Se levanta la ventana y se dice ser padre.
-
-
-            //Vamos a llamar a la clase del FormularioClienteController, desde ahí seteamos la info recolectada del cliente que vamos a agregar.
-            //Para eso necesitamos el método respectivo en FormularioClienteController.
+            Parent root = loader.load();
             addClienteController controller = loader.getController();
             controller.setCliente(client, editar);
-            Stage stage = new Stage(); //Voy a presentar la pestaña...
+            Stage stage = new Stage();
             stage.setTitle(editar ? "Modificar Cliente" : "Agregar Cliente");
-            stage.setScene(new Scene(root)); //Es inicio-view.fxml
+            stage.setScene(new Scene(root));
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.showAndWait();
-
-            return (Cliente) stage.getUserData(); //De este Stage, voy a traerme lo que trajo el llenado de la otra pestaña y construyo los datos.
+            return (Cliente) stage.getUserData();
         } catch (IOException error) {
             mostrarAlerta("Error abriendo el formulario", error.getMessage());
             return null;
@@ -90,7 +84,7 @@ public class TabConsultaClientesController implements Initializable {
 
 
 
-    private void mostrarAlerta(String titulo, String mensaje) { //Todas las alertas que dropiemos, se van a lanzar con este método.
+    private void mostrarAlerta(String titulo, String mensaje) {
 
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(titulo);
@@ -148,30 +142,42 @@ public class TabConsultaClientesController implements Initializable {
             throw new RuntimeException(e);
         }
         tblClientes.setItems(listaClientes);
-
+        comboBoxCriteroFiltro.setItems(FXCollections.observableArrayList("ID", "Nombre", "Identificación"));
+        comboBoxCriteroFiltro.setValue("ID");
     }
 
     @FXML
-    public void buscarCliente(ActionEvent actionEvent) {
+    public void buscarCliente(ActionEvent actionEvent) throws SQLException {
+        listaClientes.clear();
+        if (txtFiltroCliente == null || txtFiltroCliente.getText().isEmpty()) {
+            listaClientes.addAll(clienteLogica.findAll());
+            return;
+        }
+
         try {
-            String criterio = txtFiltroCliente.getText().trim().toLowerCase();
-            if (criterio.isEmpty()) {
-                tblClientes.setItems(listaClientes);
-                return;
-            }
+            String filtro = txtFiltroCliente.getText().toLowerCase().trim();
+            String tipoFiltro = comboBoxCriteroFiltro.getValue();
 
-            ObservableList<Cliente> filtrados = listaClientes.stream()
-                    .filter(c -> c.getIdentificacion().toLowerCase().contains(criterio)
-                            || c.getNombre().toLowerCase().contains(criterio)
-                            || c.getPrimerApellido().toLowerCase().contains(criterio))
-                    .collect(Collectors.toCollection(FXCollections::observableArrayList));
-
-
-            //listaClientes.addAll(clienteLogica.findAllByParameters(criterio));
-            tblClientes.setItems(listaClientes);
-
-        } catch (Exception error) {
-            mostrarAlerta("Error buscando el cliente", error.getMessage());
+            List<Cliente> todosLosClientes = clienteLogica.findAll();
+            List<Cliente> filtrados = todosLosClientes.stream()
+                    .filter(p -> {
+                        switch (tipoFiltro) {
+                            case "ID":
+                                return String.valueOf(p.getId()).contains(filtro);
+                            case "Nombre":
+                                return p.getNombre().toLowerCase().contains(filtro);
+                            case "Identificación":
+                                return String.valueOf(p.getIdentificacion()).contains(filtro);
+                            default:
+                                return p.getNombre().toLowerCase().contains(filtro) ||
+                                        String.valueOf(p.getId()).contains(filtro) ||
+                                        String.valueOf(p.getIdentificacion()).contains(filtro);
+                        }
+                    })
+                    .collect(Collectors.toList());
+            listaClientes.setAll(filtrados);
+        } catch (Exception e) {
+            mostrarAlerta("Error", "Error al filtrar Clientes: " + e.getMessage());
         }
     }
 }

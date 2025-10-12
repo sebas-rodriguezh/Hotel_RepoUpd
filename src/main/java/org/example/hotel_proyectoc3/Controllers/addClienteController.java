@@ -66,7 +66,7 @@ public class addClienteController {
     }
 
 
-    private void mostrarAlerta(String titulo, String mensaje) { //Todas las alertas que dropiemos, se van a lanzar con este método.
+    private void mostrarAlerta(String titulo, String mensaje) {
 
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(titulo);
@@ -80,18 +80,9 @@ public class addClienteController {
     }
 
     public void setCliente(Cliente cliente, Boolean editar) {
-        //Si el cliente es nuevo,es decir, si venimos de un "Agregar Cliente".
-        //Entonces solo setramos el cliente nuevo que vamos a guardar, y el modo de edición se mantiene en false.
         this.cliente = cliente;
         this.modificacion = editar;
-
-
-        //Si el cliente NO es nuevo, es decir, venimos de un "Modificar Cliente".
-        //Entonces modificamos los datos y los guardamos ahora.
         if (editar && cliente != null) {
-            //Lo quiero editar.
-            //Voy a pasar los datos a mi ventana de InicioController.
-
             txtNumeroIdentificacion.setText(cliente.getIdentificacion());
             txtNombre.setText(cliente.getNombre());
             txtPrimerApellido.setText(cliente.getPrimerApellido());

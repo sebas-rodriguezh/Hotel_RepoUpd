@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 public class HabitacionLogica {
     private HabitacionDatos store = new HabitacionDatos();
 
-    // Funciones de lectura
     public List<Habitacion> findAll() throws SQLException {
         return store.findAll();
     }

@@ -53,7 +53,6 @@ public class addHabitacionController implements Initializable {
             Habitacion resultado = null;
 
             if (!modificacion) {
-                // Crear nueva habitación
                 Habitacion nuevaHabitacion = new Habitacion(numero, tipo, estado, precio, capacidad);
                 resultado = habitacionLogica.create(nuevaHabitacion);
 
@@ -64,7 +63,6 @@ public class addHabitacionController implements Initializable {
                     return;
                 }
             } else {
-                // Modificar habitación existente
                 habitacion.setNumero(numero);
                 habitacion.setTipo(tipo);
                 habitacion.setEstado(estado);

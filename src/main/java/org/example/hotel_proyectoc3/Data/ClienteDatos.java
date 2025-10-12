@@ -8,11 +8,7 @@ import java.util.List;
 
 public class ClienteDatos {
     public List<Cliente> findAll() throws SQLException {
-        //Construir el query que se ejecuta en MySQL
-        String sql = "Select * from cliente ORDER BY id"; //Auto incremental y primary-key.
-        //String sqlAlternativo = "Select * from cliente where nombre = 'Juan'";
-
-        //Conectamos a la base de datos.
+        String sql = "Select * from cliente ORDER BY id";
 
         try (Connection cn = DB.getConnection(); //1. Conexión.
         PreparedStatement ps = cn.prepareStatement(sql); //2. Preparar la sentencia SQL.

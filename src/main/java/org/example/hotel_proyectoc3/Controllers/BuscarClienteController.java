@@ -63,7 +63,7 @@ public class BuscarClienteController implements Initializable {
 
     private void cargarTodosLosClientes() {
         try {
-            List<Cliente> Clientes = gestorClientes.findAll(); //Cae del bd por ahora vacío.
+            List<Cliente> Clientes = gestorClientes.findAll();
             tbvResultadoBCliente.setItems(FXCollections.observableArrayList(Clientes));
         } catch (Exception e) {
             mostrarAlerta("Error", "Error al cargar los Clientes: " + e.getMessage());

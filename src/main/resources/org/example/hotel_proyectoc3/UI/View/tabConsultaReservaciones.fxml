@@ -35,7 +35,7 @@
                     <columns>
                         <TableColumn id="" fx:id="idReservacion" prefWidth="67.0" text="ID" />
                         <TableColumn id="" fx:id="colNombreCliente" prefWidth="82.0" text="Cliente" />
-                        <TableColumn id="" fx:id="colNumeroHabitacion" minWidth="0.0" prefWidth="102.0" text="N° Habitación" />
+                        <TableColumn id="" fx:id="colNumeroHabitacion" minWidth="0.0" prefWidth="102.0" text="# Habitación" />
                         <TableColumn id="" fx:id="colFechaLlegada" minWidth="0.0" prefWidth="135.0" text="Fecha de llegada" />
                         <TableColumn id="" fx:id="colFechaSalida" minWidth="0.0" prefWidth="126.0" text="Fecha de salida" />
                         <TableColumn id="" fx:id="colPrecioTotalReservacion" minWidth="0.0" prefWidth="116.0" text="Precio Total" />
@@ -43,17 +43,12 @@
                 </TableView>
             </children>
         </Pane>
-        <Button id="btnGuardarMedicamento" fx:id="btnInsertarReserva" alignment="CENTER" layoutX="739.0" layoutY="242.0" mnemonicParsing="false" onAction="#insertarReserva" prefHeight="30.0" prefWidth="101.0" style="-fx-background-color: #228B22; -fx-text-fill: white; -fx-font-weight: bold;" text="Insertar">
+        <Button id="btnGuardarMedicamento" fx:id="btnInsertarReserva" alignment="CENTER" layoutX="730.0" layoutY="242.0" mnemonicParsing="false" onAction="#insertarReserva" prefHeight="30.0" prefWidth="139.0" style="-fx-background-color: #228B22; -fx-text-fill: white; -fx-font-weight: bold;" text="Insertar">
             <font>
                 <Font size="14.0" />
             </font>
         </Button>
-        <Button id="btnBuscarMedicamento" fx:id="btnModificarReserva" alignment="CENTER" layoutX="737.0" layoutY="297.0" mnemonicParsing="false" onAction="#modificarReserva" prefHeight="30.0" prefWidth="101.0" style="-fx-background-color: #FF8C00; -fx-text-fill: white; -fx-font-weight: bold;" text="Modificar">
-            <font>
-                <Font size="14.0" />
-            </font>
-        </Button>
-        <Button id="btnBorrarMedicamento" fx:id="btnBorrarReserva" alignment="CENTER" layoutX="737.0" layoutY="345.0" mnemonicParsing="false" onAction="#borrarReserva" prefHeight="30.0" prefWidth="101.0" style="-fx-background-color: #DC143C; -fx-text-fill: white; -fx-font-weight: bold;" text="Borrar">
+        <Button id="btnBorrarMedicamento" fx:id="btnBorrarReserva" alignment="CENTER" layoutX="730.0" layoutY="303.0" mnemonicParsing="false" onAction="#borrarReserva" prefHeight="30.0" prefWidth="139.0" style="-fx-background-color: #DC143C; -fx-text-fill: white; -fx-font-weight: bold;" text="Liberar reserva">
             <font>
                 <Font size="14.0" />
             </font>
